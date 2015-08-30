@@ -77,7 +77,9 @@ def save_image(img=None,img_id=None):
     assert img is not None
     assert img_id is not None
     try:
-        imwrite(r"{0}\{1}.jpg".format(SAVE_FOLDER,img_id),img) #save image
+        imwrite(r"{0}/{1}.jpg".format(SAVE_FOLDER,img_id)
+                ,img
+                ,[IMWRITE_JPEG_QUALITY,100]) #save image
         print("INFO","Picture {0} saved".format(img_id))
         msg = "INFO \t saved image {0}".format(img_id)
     except Exception as e:
