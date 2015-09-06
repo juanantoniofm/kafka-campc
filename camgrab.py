@@ -2,7 +2,6 @@
 
 import settings 
 
-print dir(settings)
 #TIME_WINDOW=settings.TIME_WINDOW if settings.TIME_WINDOW is not None else 15 # seconds to keep the window open
 TIME_WINDOW=1
 #PICTURE_INTERVAL=settings.PICTURE_INTERVAL or 25 # take a image every this seconds
@@ -25,8 +24,8 @@ limit=20 # limit the number of pictures to take in case something goes wonky
 
 
 import time
-from cv2 import *
 
+from genutils import *
 
 
 def grab_pic(camera_index=0):
@@ -38,66 +37,24 @@ def grab_pic(camera_index=0):
     s, img = cam.read()
     if s: # the frame was captured without errors
         msg =  "DEBUG: Picture retrieved without errors"
-        print msg
+        print "INFO:", msg
         return img, msg
     else:
         msg = "ERROR: Couldn't retrieve image from camera {0}".format(camera_index)
-        print(msg)
+        print("INFO:", msg)
         return None, msg
 
     #return img # TODO:Confirm that image is None upon failure to be able to enable this code
 
 
-
-def display_image(img = None,img_id=None):
-    """
-    just create a simple window to display the image. 
-    The window should go away after a few seconds
-    TODO: for now I have implemented the keypress to close the window
-    """
-    assert img is not None # as it means that no pic has been passed
-    assert img_id is not None # as it means that no pic has been passed
-    windowName = "{0}".format(img_id)
-    namedWindow(windowName,CV_WINDOW_AUTOSIZE)
-    imshow(windowName,img)
-    print "DEBUG:", "TIME_WINDOWN type: ", type(TIME_WINDOW)
-        # TODO: for some extrange reason, using an int variable doesnt work. 
-        # python passes by object reference (object references are passed by value)
-        # so it should work.
-    waitKey(300)
-    destroyWindow("cam-test")
-    return img, "INFO: image {0} displayed".format(img_id)
-
-
-def save_image(img=None,img_id=None):
-    """
-    save the image to disk
-    img :: the picture blob
-    img_id :: a pregenerated id for this image
-    """
-    assert img is not None
-    assert img_id is not None
-    try:
-        imwrite(r"{0}/{1}.jpg".format(SAVE_FOLDER,img_id)
-                ,img
-                ,[IMWRITE_JPEG_QUALITY,100]) #save image
-        print("INFO","Picture {0} saved".format(img_id))
-        msg = "INFO \t saved image {0}".format(img_id)
-    except Exception as e:
-        #TODO: Pokemon exception. Please remove
-        msg = "ERROR \t Unable to save image {0},{1}".format(
-            img_id,
-            e)
-        print("ERROR", msg)
-    return img,msg 
-
-
-def get_img_id(timestamp, camera):
+def get_img_id(timestamp=None, camera=None):
     """
     create an id for the image. Uses timestamp and camera of origin.
     timestamp :: seconds since epoch (in UTC usually)
     camera :: a string to identify the camera of origin
     """
+    assert camera is not None
+    assert timestamp is not None
     timeString = time.strftime("%Y%m%d_%H%M_%S", timestamp)
     return "{0}_cam{1}".format(timeString,camera)
 

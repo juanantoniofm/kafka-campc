@@ -14,3 +14,5 @@ TODO: this is the most naive way of doing "settings". rely on zookeper? :)
 #PICTURE_INTERVAL=25 # take a image every this seconds
 CAMERA=0 # the id of the camera for openCV (maybe /dev/video<number> )
 SAVE_FOLDER="captures" # folder to put pictures and barcodes. default to current dir.
+
+KAFKA_SERVER="localhost:9092"

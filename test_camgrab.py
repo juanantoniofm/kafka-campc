@@ -9,7 +9,7 @@ import camgrab
 
 class test_get_img_id(unittest.TestCase):
     def test_fails_on_no_input(self):
-        self.assertRaises(Exception, camgrab.get_img_id())
+        self.assertRaises(AssertionError, camgrab.get_img_id)
 
     def test_accepts_string_id(self):
         """
