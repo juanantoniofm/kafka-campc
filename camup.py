@@ -133,7 +133,6 @@ def lock_picture(img_filename):
     return lockfile
 
 
-
 def acquire_a_picture():
     picture_name = get_first_picture(read_dir(settings.SAVE_FOLDER))
     assert picture_name is not None

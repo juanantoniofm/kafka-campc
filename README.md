@@ -8,6 +8,13 @@ Modify the `settings.py` file with your environmental settings.
 
 make sure the `$DISPLAY` variable is correctly setup to your display number
 
+NOTE: it's designed to run with Python >2.7
+To make it work in python 3,
+
+- enable conditional imports in the tests
+
+- fix the print statements to print functions
+
 
 ## Usage
 

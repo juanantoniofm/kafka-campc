@@ -1,7 +1,9 @@
 
 
+import __builtin__
+
 import unittest
-from mock import MagicMock,patch
+from mock import MagicMock,patch, mock_open
 import os
 
 from kafka.common import *
@@ -164,19 +166,53 @@ class test_publish(BaseTest):
 
 class test_lock_file(BaseTest):
     @patch("os.utime")
-    def test_oserror(self,mockos):
+    @patch("camup.open")
+    def test_oserror(self,mockopen,mockos):
         """If there is an issue in the filesystem"""
         mockos.side_effect=OSError("the filesystem is Fake!!")
-        result = camup.lock_picture("anyfile")
+        self.assertRaises(OSError, camup.lock_picture,"anyfile")
         assert mockos.called is True
 
     @patch("os.utime")
-    def test_osworks(self,mockos):
+    @patch("camup.open")
+    def test_osworks(self,mockopen,mockos):
         """creating a lock returns the name of the lock"""
         mockos.return_value = "oh yeah"
         result = camup.lock_picture("anyfile")
         assert mockos.called is True
         assert result == "anyfile.lock"
+
+
+class test_acquire_a_picture(BaseTest):
+    """
+    this class requires a bit more of work, due to the patching of open.
+    that's why we need to import builtin (for python 2 only)
+    and use patch.object instead of just patch.
+    """
+    @patch("camup.get_first_picture")
+    @patch("camup.lock_picture")
+    @patch.object(__builtin__,"open", mock_open(read_data="datastream"))
+    def test_alright(self,mocklock,mockgetfirst):
+        """ if everything goes well, return the image stream and the img_id"""
+        mockgetfirst.return_value = "thiscouldbea.jpg"
+        result = camup.acquire_a_picture()
+
+        mocklock.assert_called_with("thiscouldbea.jpg")
+        assert mockgetfirst.called is True
+        self.assertEqual(("datastream","thiscouldbea"), result)
+
+
+    @patch("camup.get_first_picture")
+    @patch("camup.lock_picture")
+    @patch.object(__builtin__,"open", mock_open(read_data="datastream"))
+    def test_alright(self,mocklock,mockgetfirst):
+        """ if everything goes well, return the image stream and the img_id"""
+        mockgetfirst.return_value = "thiscouldbea.jpg"
+        result = camup.acquire_a_picture()
+
+        mocklock.assert_called_with("thiscouldbea.jpg")
+        assert mockgetfirst.called is True
+        self.assertEqual(("datastream","thiscouldbea"), result)
 
 
 if __name__=="__main__":
