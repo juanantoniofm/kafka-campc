@@ -55,15 +55,27 @@ class test_first_picture(BaseTest):
 
         assert file is None
 
-    def test_one_jpg_one_pic(self):
+    @patch("camup.is_locked")
+    def test_one_jpg_one_pic(self,mocklock):
+        mocklock.return_value = False
         filelist = ["foo.jpg"]
         file = camup.get_first_picture(filelist)
         assert file == "foo.jpg"
 
-    def test_caps_are_the_same(self):
+    @patch("camup.is_locked")
+    def test_caps_are_the_same(self,mocklock):
+        mocklock.return_value = False
         filelist = ["foo.JpG"]
         file = camup.get_first_picture(filelist)
         assert file == "foo.JpG"
+
+    @patch("camup.is_locked")
+    def test_a_locked_picture_returns_next(self,mocklock):
+        mocklock.side_effect = [True, False] # this is a special call to only lock the 1st file
+        filelist = ["pic1.jpeg","pic1.jpeg.lock","pic2.jpeg"]
+        file = camup.get_first_picture(filelist)
+        assert file == "pic2.jpeg"
+
 
     def test_non_images_are_ignored(self):
         filelist = ["foo.txt","bar.jpog","thumbs.db"]
@@ -213,6 +225,17 @@ class test_acquire_a_picture(BaseTest):
         mocklock.assert_called_with("thiscouldbea.jpg")
         assert mockgetfirst.called is True
         self.assertEqual(("datastream","thiscouldbea"), result)
+
+
+class test_is_locked(BaseTest):
+    @patch("os.listdir")
+    def test_the_picture_is_locked_returns_true(self, mockos):
+        mockos.return_value = ["pic1.jpg","pic2.jpeg","pic1.jpg.lock"]
+        assert camup.is_locked("pic1.jpg") is True
+
+    @patch("os.listdir")
+    def test_another_picture_not_locked_return_false(self,mockos):
+        mockos.return_value = ["pic1.jpg","pic2.jpeg", "pic2.jpeg.lock"]
 
 
 if __name__=="__main__":

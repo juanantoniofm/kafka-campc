@@ -2,21 +2,21 @@
 # -*- coding: utf-8 -*-
 
 
-"""
+"""  # pragma: no cover
 The part of the tool that does the publishing to kafka.
 
 It gets images from the directory, locks them, creates the message and moves the files
 """
 
-import settings
-import os
-from time import sleep
+import settings  # pragma: no cover
+import os  # pragma: no cover
+from time import sleep  # pragma: no cover
 
-import base64
-import json
+import base64  # pragma: no cover
+import json  # pragma: no cover
 
-from kafka import SimpleProducer, KafkaClient
-from kafka.common import *
+from kafka import SimpleProducer, KafkaClient  # pragma: no cover
+from kafka.common import *  # pragma: no cover
 
 def read_dir(path = None):
     assert path is not None
@@ -30,16 +30,28 @@ def read_dir(path = None):
         raise 
         
 
-def get_first_picture(filelist):
+def is_locked(file):
     """
-    process a list of files and finds the first picture
+    find out if a picture is being processed by some other thread
+    """
+    return True
+
+
+
+def get_first_picture(filelist):
+    """ 
+    process a list of files and finds the first picture.
+    if the picture is locked, get the next one.
     """
     if filelist is None: 
         raise ValueError("No file list provided or wrong working folder")
     extensions = ["jpeg",".jpg",".png","tiff",".raw",".bmp"] # Fiesta!!!
     for file in filelist:
         if file[-4:].lower() in extensions:
-            return file
+            if is_locked(file):
+                continue
+            else:
+                return file
 
 
 def clean_files(filelist=None):
@@ -133,11 +145,12 @@ def lock_picture(img_filename):
     return lockfile
 
 
-def acquire_a_picture():
+def acquire_a_picture():  # pragma: no cover
     picture_name = get_first_picture(read_dir(settings.SAVE_FOLDER))
     assert picture_name is not None
-    # the picture file wont be created if there are no pictures. 
+    # the picture file wont be found if there are no pictures. 
     # then we should wait and try again later
+    # but we plan to do it at a higher stage (ie the caller)
     picture_file = os.path.join(settings.SAVE_FOLDER,picture_name)
     img_id = picture_name.split(".")[0]
     print "DEBUG:", "this is the first picture", img_id
@@ -147,7 +160,7 @@ def acquire_a_picture():
     return img, img_id
 
 
-if __name__=="__main__":
+if __name__=="__main__":  # pragma: no cover
     # Printing initial information
     print "INFO:", dir(settings)
     print "INFO:", "SAVE FOLDER:", settings.SAVE_FOLDER
