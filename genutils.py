@@ -21,7 +21,7 @@ def display_image(img = None,img_id=None):
     windowName = "{0}".format(img_id)
     namedWindow(windowName,CV_WINDOW_AUTOSIZE)
     imshow(windowName,img)
-    print "DEBUG:", "TIME_WINDOWN type: ", type(settings.TIME_WINDOW)
+    print( "DEBUG:", "TIME_WINDOWN type: ", type(settings.TIME_WINDOW))
         # TODO: for some extrange reason, using an int variable doesnt work. 
         # python passes by object reference (object references are passed by value)
         # so it should work.

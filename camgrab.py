@@ -10,6 +10,7 @@ CAMERA=settings.CAMERA or 0 # the id of the camera for openCV (maybe /dev/video<
 SAVE_FOLDER=settings.SAVE_FOLDER or "." # folder to put pictures and barcodes
 
 limit=20 # limit the number of pictures to take in case something goes wonky
+display = False # wether to open a window preview in the local machine or not. False won't open the window, leaving that for someone else
 
 
 # example taken from stackoverflow
@@ -37,7 +38,7 @@ def grab_pic(camera_index=0):
     s, img = cam.read()
     if s: # the frame was captured without errors
         msg =  "DEBUG: Picture retrieved without errors"
-        print "INFO:", msg
+        print("INFO:", msg)
         return img, msg
     else:
         msg = "ERROR: Couldn't retrieve image from camera {0}".format(camera_index)
@@ -59,7 +60,7 @@ def get_img_id(timestamp=None, camera=None):
     return "{0}_cam{1}".format(timeString,camera)
 
 
-if __name__=="__main__":
+if __name__=="__main__": # pragma: no cover
     """
     """
     # we start grabbing image every 10 seconds or so
@@ -68,6 +69,7 @@ if __name__=="__main__":
         print("INFO","Taking image and stuff")
         img,msg = grab_pic(CAMERA) # get the actual image from the camera
         img_id = get_img_id(time.gmtime(), CAMERA)  # get an id to track the picture
-        display_image(img, img_id) # open a window with it
+        if display:
+            display_image(img, img_id) # open a window with it
         save_image(img, img_id) # put it in a file
         time.sleep(PICTURE_INTERVAL)
