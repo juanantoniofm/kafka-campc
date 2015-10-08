@@ -179,11 +179,10 @@ def acquire_a_picture(lockit = True, last = False):
     return img, img_id
 
 
-if __name__=="__main__":  # pragma: no cover
-    # Printing initial information
-    print( "INFO:", dir(settings))
-    print( "INFO:", "SAVE FOLDER:", settings.SAVE_FOLDER)
-    print("INFO:","Working dir {0};".format(settings.SAVE_FOLDER))
+def upload_next():
+    """
+    just upload the next picture
+    """
 
     img, img_id = acquire_a_picture()
 
@@ -196,5 +195,11 @@ if __name__=="__main__":  # pragma: no cover
         clean_files([picture_file,lockfile])
 
 
+if __name__=="__main__":  # pragma: no cover
+    # Printing initial information
+    print( "INFO:", dir(settings))
+    print( "INFO:", "SAVE FOLDER:", settings.SAVE_FOLDER)
+    print("INFO:","Working dir {0};".format(settings.SAVE_FOLDER))
 
+    upload_next()
 
