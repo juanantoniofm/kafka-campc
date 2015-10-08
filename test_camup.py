@@ -117,13 +117,26 @@ class test_clean_files(BaseTest):
     
 
 class test_build_message(BaseTest):
-    def test_basic_input(self):
-        binary_msg = '111101110001011010011101101110000111001111100101101111111010011100100100010111010100000100010110011011011111101111100010101100100000100010110100111011011100001110011111001011000101110101000001000101011001110110110001101111001101110011011101000101111101'
+    @patch("uuid.uuid4")
+    def test_basic_input(self, mockuu):
+        mockuu.return_value ="this-is-a-uuid"
         result = camup.build_message("foo","bar")
-        self.assertEqual(binary_msg, result)
+        expectation = '{"pictureName": "foo", "image": "YmFy\\n", "barcode": "bull-seat", "ride": "chewit", "id": "this-is-a-uuid"}'
+        self.assertEqual(expectation, result)
 
     def test_noinput(self):
         self.assertRaises(TypeError, camup.build_message)
+
+    def test_fail_on_binary_passed_as_id(self):
+        bigbin = "aoeuidrtns" * 1000
+        self.assertRaises(AssertionError, camup.build_message, bigbin, "foo","bar")
+
+    @patch("uuid.uuid4")
+    def test_adding_a_barcode(self,mockuu):
+        mockuu.return_value = "this-is-a-uuid"
+        result = camup.build_message("foo","bar","barcode")
+        expectation = '{"pictureName": "foo", "image": "YmFy\\n", "barcode": "barcode", "ride": "chewit", "id": "this-is-a-uuid"}'
+        self.assertEqual(expectation,result)
 
 
 class test_send_message(BaseTest):

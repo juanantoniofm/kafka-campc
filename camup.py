@@ -82,7 +82,8 @@ def publish(topic, msg):
     topic :: Is not really needed, but i put it for wrapping and logging purposes
     """
     print("INFO:","publishing to topic {0}:".format(topic))
-    yesorno = raw_input("Submitt a message?: ")
+    #yesorno = raw_input("Submitt a message?: ") # TODO: configure this
+    yesorno = "yes" # upload by defo
     if "y" in yesorno[0:1]:
         send_message(msg)
         print( "INFO:","Succesfully submitted")
@@ -92,24 +93,23 @@ def publish(topic, msg):
         return  None
 
 
-def build_message(img_id,img):
+def build_message(img_id,img,barcode = None):
     """
     builds a message for kafka in json with the picture encoded in base64
     and returns the byte stream
     """
-    print img_id
+    assert len(img_id) < 1000 # to avoid confusing bin and id
     json_data = {
-            "id":uuid.uuid1().hex,
+            "id":str(uuid.uuid4()),
             "pictureName":img_id,
             "image": base64.encodestring(img),
-            "barcode": "bull-seat",
+            "barcode": "bull-seat" if not barcode else barcode,
             "ride": "chewit"
             }
     # convert to json
     json_string = json.dumps(json_data)
     # convert to binary 
-    msg = "".join(format(x, "b") for x in bytearray(json_string))
-    return msg
+    return json_string
 
 
 def send_message(msg):
@@ -191,6 +191,8 @@ if __name__=="__main__":  # pragma: no cover
     msg =  build_message(img_id, img)
 
     if publish(settings.TOPIC, msg):
+        picture_file = settings.SAVE_FOLDER + "/" + img_id + ".jpg"
+        lockfile = picture_file + ".lock"
         clean_files([picture_file,lockfile])
 
 
