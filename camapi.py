@@ -1,6 +1,32 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
+"""
+# Cam API
+
+The main way of controlling the machine is 
+through a web interface. 
+
+Currently, is a hacky solution, splitted in different components.
+
+### camup.py
+
+holds methods to upload pictures to kafka
+
+
+### cam_*
+
+are files with workers for the threaded communicacion with Kafka
+
+### camgrab.py
+
+takes care of grabbing pictures from the camera
+
+and so on... ;) 
+
+happy hacking 
+"""
+
 import os
 
 import json # for obvious reasons
@@ -26,27 +52,14 @@ from settings import SAVE_FOLDER, TOPIC, KAFKA_SERVER
 
 @app.route('/help', methods=["GET"])
 def documentation():
-    #return "Yo,dawg"
-    return Markup(markdown.markdown(__doc__))
+    return "Yo,dawg"
+    #return Markup(markdown.markdown(__doc__))
 
 
 @app.route('/', methods=["GET"])
 def main_page():
     return render_template("index.html")
 
-
-@app.route('/old', methods=["GET"])
-def main_menu():
-    return """
-    This is the API main page.
-    we are connecting to the server {0}
-    on the topic {1}, 
-    taking pictures from {2}
-    """.format(
-            KAFKA_SERVER,
-            TOPIC,
-            SAVE_FOLDER
-            )
 
 @app.route("/local/image/last", methods=["GET"])
 def get_image(picture = None):

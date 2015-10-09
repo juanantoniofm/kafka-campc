@@ -1,6 +1,14 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
+"""
+
+# The cam main
+
+a caiman
+
+"""
+
 import base64
 import threading, logging, time
 import uuid
@@ -16,6 +24,7 @@ import camup
 
 from cam_heartbeat import Heartbeat
 #from cam_picupload import PicUpload # not in use, we go for functions
+from cam_grab import Grabber # the one that takes the pictures
 
 ################################################################################
 import threading
@@ -29,6 +38,7 @@ commonDataStruct = {}
 dataLock = threading.Lock()
 # thread handler
 heartThread = Heartbeat()
+grabThread = Grabber()
 
 
 def create_app():
@@ -37,8 +47,11 @@ def create_app():
     def interrupt():
         global uploadThread
         global heartThread
+        global grabThread
         uploadThread.cancel()
         heartThread.cancel()
+        grabThread.cancel()
+
 
     def start_heartbeat():
         """ this kind of thread control shows how to start a thread declared as object"""
@@ -46,6 +59,7 @@ def create_app():
         print "starting heart beat"
         #heartThread = threading.Timer(POOL_TIME, heartThread.run, ())
         heartThread.start()
+
 
     def upload_now():
         global commonDataStruct
@@ -70,8 +84,17 @@ def create_app():
         uploadThread.start()
         
     # Initiate
-    start_heartbeat()
+    threads = [
+            heartThread,
+            grabThread
+            ]
+    for t in threads:
+        print "starting Thread {0}".format(type(t))
+        t.start()
+
+
     upload_start()
+
     # When you kill Flask (SIGTERM), clear the trigger for the next thread
     atexit.register(interrupt)
     return app

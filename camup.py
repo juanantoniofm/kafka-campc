@@ -198,7 +198,11 @@ def upload_next():
     just upload the next picture
     """
 
-    img, img_id = acquire_a_picture()
+    try:
+        img, img_id = acquire_a_picture()
+    except AssertionError:
+        print "No more pictures to process"
+        return 404
 
     print( "DEBUG","Creating the message")
     msg =  build_message(img_id, img)
