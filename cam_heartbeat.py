@@ -11,7 +11,7 @@ from kafka.producer import SimpleProducer
 import settings
 
 class Heartbeat(threading.Thread):
-    daemon = True
+    #daemon = True
 
     def run(self):
         self.client = KafkaClient(settings.KAFKA_SERVER)

@@ -47,7 +47,8 @@ app = Flask(__name__)
 
 from camup import acquire_a_picture, build_message, publish, clean_files
 
-from settings import SAVE_FOLDER, TOPIC, KAFKA_SERVER
+from settings import SAVE_FOLDER, TOPIC, KAFKA_SERVER, CAMERA
+import genutils
 
 
 @app.route('/help', methods=["GET"])
@@ -60,6 +61,20 @@ def documentation():
 def main_page():
     return render_template("index.html")
 
+
+@app.route("/live/image/last", methods=["GET"])
+def get_live_feed():
+    import camgrab
+    try:
+        img, msg = camgrab.grab_pic(CAMERA)
+        img_id = "live"
+        genutils.save_image(img, img_id) # put it in a file
+        picture_file = os.path.join(SAVE_FOLDER, "{0}.jpg".format(img_id) )
+        return send_file(picture_file)
+    except AssertionError as e:
+        logging.exception(e)
+        return render_template("error.html"), 404
+            
 
 @app.route("/local/image/last", methods=["GET"])
 def get_image(picture = None):
