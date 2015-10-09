@@ -8,6 +8,7 @@ The name of this library is a little joke to our C devs
 
 from cv2 import *
 import settings
+import json
 
 
 def display_image(img = None,img_id=None):
@@ -52,4 +53,13 @@ def save_image(img=None,img_id=None):
         print("ERROR", msg)
     return img,msg 
 
-
+def process_message_from_kafka(raw_message = None):
+        """take care of procesing the incoming msg and return Struct"""
+        message = json.loads(raw_message)
+        img_bin = message["image"]
+        img_id = message["id"]
+        barcode = message["barcode"] if message["barcode"] else None
+        ride = message["ride"]
+        return { "id": img_id, "image": img_bin, "barcode":barcode,
+                 "ride":ride
+               }

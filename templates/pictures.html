@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+  <!-- Basic Page Needs
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+  <meta charset="utf-8">
+  <title>Broken pictures list</title>
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <!-- Mobile Specific Metas
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- FONT
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+  <link href='//fonts.googleapis.com/css?family=Raleway:400,300,600' rel='stylesheet' type='text/css'>
+
+  <!-- CSS
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+  <link rel="stylesheet" href="static/normalize.css">
+  <link rel="stylesheet" href="static/skeleton.css">
+  <link rel="stylesheet" href="static/custom.css">
+
+  <!-- Scripts
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+
+
+</head>
+<body>
+
+  <!-- Primary Page Layout
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+
+  <div class="section values">
+    <div class="container">
+      <div class="row">
+          <h2 class="value-multiplier">Pictures on {{data["machine"]}} with conversion Errors.</h2>
+	  <p>If you don't find the customer pictures on the kiosk, it might be here.</p>
+         
+      </div>
+      <div class="row">
+{%for pic in data["picture_references"] %}
+        <div class="one-third column value">
+          <h2 class="value-multiplier">
+            <a href="http://10.200.1.31:8002/{{pic}}" class="button" >{{pic}}</a>
+	  </h2>
+          <img class="u-max-full-width" src = "http://10.200.1.31:8002/{{pic}}"  alt="{{pic}}"/>
+        </div>
+{%endfor%}
+<pre>{{ data["picture_references"] }} </pre>
+<pre>{{ picture_references }} </pre>
+      </div> <!-- row -->
+    </div> <!-- container -->
+  </div> <!-- section -->
+
+
+
+
+<!-- End Document
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+</body>
+</html>
+

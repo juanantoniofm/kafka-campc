@@ -75,8 +75,21 @@ def clean_files(filelist=None):
     for fileitem in filelist:
         os.remove(fileitem)
 
-
 def publish(topic, msg):
+    """
+    just a wrapper on send_message to be able to control if sending or not in this preview. 
+    topic :: Is not really needed, but i put it for wrapping and logging purposes
+    """
+    print("INFO:","publishing to topic {0}:".format(topic))
+    result = send_message(msg)
+    if result > 200:
+        print "ERROR:" ,"sender returned {0}".format(result)
+    elif result == 200:
+        print( "INFO:","Succesfully submitted")
+    return result
+
+
+def confirmation_publish(topic, msg):
     """
     just a wrapper on send_message to be able to control if sending or not in this preview. 
     topic :: Is not really needed, but i put it for wrapping and logging purposes
@@ -112,7 +125,7 @@ def build_message(img_id,img,barcode = None):
     return json_string
 
 
-def send_message(msg):
+def send_message(msg, retries = 5):
     """
     to kafka with love
     """
@@ -125,12 +138,13 @@ def send_message(msg):
     producer = SimpleProducer(kafka)
     print( "INFO:","producer producing")
 
-    while True:
+    while retries >= 0:
+        retries -= 1
         try:
             # Note that the application is responsible for
             # encoding messages to bytes type
             producer.send_messages(b'{0}'.format(settings.TOPIC), msg)
-            return "Ok"
+            return 200 # Ok
         except (InvalidMessageError,
                 InvalidFetchRequestError,
                 MessageSizeTooLargeError) as e:
@@ -146,7 +160,7 @@ def send_message(msg):
 
     # Send unicode message
     #producer.send_messages(b'one-topic01', u'你怎么样?'.encode('utf-8'))
-    return "Ok"
+    return 500 #If we arrived here, we have a problem
 
 
 def lock_picture(img_filename):
@@ -189,10 +203,20 @@ def upload_next():
     print( "DEBUG","Creating the message")
     msg =  build_message(img_id, img)
 
-    if publish(settings.TOPIC, msg):
+    publishing = publish(settings.TOPIC, msg)
+    if publishing == 200:
+        # If we can publish successfully, clean up
         picture_file = settings.SAVE_FOLDER + "/" + img_id + ".jpg"
         lockfile = picture_file + ".lock"
         clean_files([picture_file,lockfile])
+    if publishing == 500:
+        # something went wrong, we might have to do carefull clean up
+        picture_file = settings.SAVE_FOLDER + "/" + img_id + ".jpg"
+        lockfile = picture_file + ".lock"
+        clean_files([lockfile])
+
+
+    return 200 #TODO: maybe we can use this to complete the heartbeat?
 
 
 if __name__=="__main__":  # pragma: no cover

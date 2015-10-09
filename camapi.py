@@ -3,12 +3,20 @@
 
 import os
 
-import json
-import random
+import json # for obvious reasons
+import random # soon will be not needed
+ 
+import base64 # used to encode the pictures
+import threading # used to create threads for consumers and producers
+import logging, time # for sanity and quality, proper logging
 
-import markdown
+from kafka.client import KafkaClient # simple implementations to make our lives easy
+from kafka.consumer import SimpleConsumer
+from kafka.producer import SimpleProducer
 
-from flask import Flask, Markup, request, send_file
+import markdown # to process markdown into nice HTML for the automated documentation
+
+from flask import Flask, Markup, request, send_file, render_template
 app = Flask(__name__)
 
 from camup import acquire_a_picture, build_message, publish, clean_files
@@ -16,7 +24,18 @@ from camup import acquire_a_picture, build_message, publish, clean_files
 from settings import SAVE_FOLDER, TOPIC, KAFKA_SERVER
 
 
+@app.route('/help', methods=["GET"])
+def documentation():
+    #return "Yo,dawg"
+    return Markup(markdown.markdown(__doc__))
+
+
 @app.route('/', methods=["GET"])
+def main_page():
+    return render_template("index.html")
+
+
+@app.route('/old', methods=["GET"])
 def main_menu():
     return """
     This is the API main page.
@@ -29,17 +48,41 @@ def main_menu():
             SAVE_FOLDER
             )
 
-@app.route("/image/<picture>", methods=["GET"])
+@app.route("/local/image/last", methods=["GET"])
 def get_image(picture = None):
-
-    
+    """
+    plain and simple, get the last picture and send it to the client
+    """
     img, img_id = acquire_a_picture(lockit=False, last=True)
     picture_file = os.path.join(SAVE_FOLDER, "{0}.jpg".format(img_id) )
     return send_file(picture_file)
 
+@app.route("/remote/image/last", methods=["GET"])
+def trigger_threads():
+    """
+    start the threads - test
+    """
+    import cammain
+    #heartbeat = cammain.Heartbeat()
+    consumer = cammain.Consumer()
+    consumer.start() # TODO: this level of abstraction is borkd
+    return "deberia tener una imagen en jpeg para escupir"
+    
+    return "todo"
 
+
+# TODO:
+# we have to make it spin up the threads to communicate with kafka
+# then add health checks to that
+# then we wil have a local health check and kafka real heartbeat
 
 
 if __name__ == '__main__':
+
+    logging.basicConfig(
+        format='%(asctime)s.%(msecs)s:%(name)s:%(thread)d:%(levelname)s:%(process)d:%(message)s',
+        level=logging.DEBUG
+        )
+
     app.run(host="0.0.0.0", port=8088, debug=True)
 
