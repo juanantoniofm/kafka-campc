@@ -2,10 +2,7 @@
 
 import settings 
 
-#TIME_WINDOW=settings.TIME_WINDOW if settings.TIME_WINDOW is not None else 15 # seconds to keep the window open
-TIME_WINDOW=1
-#PICTURE_INTERVAL=settings.PICTURE_INTERVAL or 25 # take a image every this seconds
-PICTURE_INTERVAL=2
+PICTURE_INTERVAL=settings.PICTURE_INTERVAL or 20 # every 20s by default
 CAMERA=settings.CAMERA or 0 # the id of the camera for openCV (maybe /dev/video<number> )
 SAVE_FOLDER=settings.SAVE_FOLDER or "." # folder to put pictures and barcodes
 
@@ -24,7 +21,7 @@ display = False # wether to open a window preview in the local machine or not. F
 # something like libgphoto2.
 
 
-import time
+import time, uuid
 
 from genutils import *
 
@@ -48,18 +45,6 @@ def grab_pic(camera_index=0):
     #return img # TODO:Confirm that image is None upon failure to be able to enable this code
 
 
-def get_img_id(timestamp=None, camera=None):
-    """
-    create an id for the image. Uses timestamp and camera of origin.
-    timestamp :: seconds since epoch (in UTC usually)
-    camera :: a string to identify the camera of origin
-    """
-    assert camera is not None
-    assert timestamp is not None
-    timeString = time.strftime("%Y%m%d_%H%M_%S", timestamp)
-    return "{0}_cam{1}".format(timeString,camera)
-
-
 if __name__=="__main__": # pragma: no cover
     """
     """
@@ -68,7 +53,8 @@ if __name__=="__main__": # pragma: no cover
     for x in range(limit):
         print("INFO","Taking image and stuff")
         img,msg = grab_pic(CAMERA) # get the actual image from the camera
-        img_id = get_img_id(time.gmtime(), CAMERA)  # get an id to track the picture
+        #img_id = get_img_id(time.gmtime(), CAMERA)  # get an id to track the picture
+        img_id = uuid.uuid4()
         if display:
             display_image(img, img_id) # open a window with it
         save_image(img, img_id) # put it in a file

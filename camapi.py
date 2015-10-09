@@ -66,7 +66,11 @@ def get_image(picture = None):
     """
     plain and simple, get the last picture and send it to the client
     """
-    img, img_id = acquire_a_picture(lockit=False, last=True)
+    try:
+        img, img_id = acquire_a_picture(lockit=False, last=True)
+    except AssertionError:
+        return render_template("error.html"), 404
+
     picture_file = os.path.join(SAVE_FOLDER, "{0}.jpg".format(img_id) )
     return send_file(picture_file)
 

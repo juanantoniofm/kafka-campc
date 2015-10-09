@@ -48,9 +48,7 @@ def create_app():
         global uploadThread
         global heartThread
         global grabThread
-        uploadThread.cancel()
-        heartThread.cancel()
-        grabThread.cancel()
+        uploadThread.cancel() # only the Timer has cancel
 
 
     def start_heartbeat():

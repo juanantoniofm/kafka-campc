@@ -72,6 +72,7 @@ def get_picture_from_storage(filelist = None, reverse = False):
 def clean_files(filelist=None):
     """clean the environment"""
     assert type(filelist) == type([])
+    print "DEBUG: Cleaning {0}".format(repr(filelist))
     for fileitem in filelist:
         os.remove(fileitem)
 
