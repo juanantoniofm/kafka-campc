@@ -39,6 +39,7 @@ dataLock = threading.Lock()
 # thread handler
 heartThread = Heartbeat()
 grabThread = Grabber()
+consumerThread = threading.Thread()
 
 
 def create_app():
@@ -49,15 +50,6 @@ def create_app():
         global heartThread
         global grabThread
         uploadThread.cancel() # only the Timer has cancel
-
-
-    def start_heartbeat():
-        """ this kind of thread control shows how to start a thread declared as object"""
-        global heartThread
-        print "starting heart beat"
-        #heartThread = threading.Timer(POOL_TIME, heartThread.run, ())
-        heartThread.start()
-
 
     def upload_now():
         global commonDataStruct
@@ -80,6 +72,27 @@ def create_app():
         print("Starting upload")
         uploadThread = threading.Timer(POOL_TIME, upload_now , ())
         uploadThread.start()
+
+
+    def consume_now():
+        """
+        consume a pic from kafka
+        """
+        client = KafkaClient(settings.KAFKA_SERVER)
+        consumer = SimpleConsumer(client, "my_group", "pictures", fetch_size_bytes=30000000)
+        for message in consumer:
+            print message
+            #TODO: to write
+
+
+
+    def monitor_start():
+        """
+        go and get pics from kafka
+        """
+        print("getting pics from Kafka")
+        consumerThread = threading.Timer(POOL_TIME, consume_now, ())
+        consumerThread.start()
         
     # Initiate
     threads = [
@@ -100,4 +113,4 @@ def create_app():
 print "starting"
 app = create_app()  
 
-app.run(host="0.0.0.0", port=8088, debug=True)
+#app.run(host="0.0.0.0", port=8088, debug=True)

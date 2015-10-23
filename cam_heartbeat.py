@@ -4,6 +4,7 @@
 import uuid
 import time
 import threading
+import json
 
 from kafka.client import KafkaClient
 from kafka.producer import SimpleProducer
@@ -18,6 +19,11 @@ class Heartbeat(threading.Thread):
         self.producer = SimpleProducer(self.client)
 
         while True:
-            self.producer.send_messages('heartbeats', """{"id":str(uuid.uuid4()), "status": 200, "serviceName":"chewit_cam" }""")
+            data = {
+                    "id": str(uuid.uuid4()),
+                    "status":200,
+                    "serviceName": settings.RIDE
+                    }
+            self.producer.send_messages("heartbeats", json.dumps(data))
             time.sleep(5)
 

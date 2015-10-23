@@ -115,10 +115,9 @@ def build_message(img_id,img,barcode = None):
     assert len(img_id) < 1000 # to avoid confusing bin and id
     json_data = {
             "id":str(uuid.uuid4()),
-            "pictureName":img_id,
-            "image": base64.encodestring(img),
+            "picture": base64.encodestring(img),
             "barcode": "bull-seat" if not barcode else barcode,
-            "ride": "chewit"
+            "ride": settings.RIDE
             }
     # convert to json
     json_string = json.dumps(json_data)

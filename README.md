@@ -43,3 +43,6 @@ that will work in most cases.
 
 - choose an error management path. Right now exceptions are re raised but never addressed. We need a retry mechanism.
 
+## TOFIX
+
+- there is an issue with the auxiliary threads. We need to kill manually

@@ -25,4 +25,8 @@ class Grabber(threading.Thread):
             
             time.sleep(settings.PICTURE_INTERVAL)
 
+    def cancel(self):
+        """ we should disconnect and kill the thread """
+        #TODO: write the cancel for the grabber
+        pass
     
